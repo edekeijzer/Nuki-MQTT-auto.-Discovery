@@ -28,8 +28,6 @@ class Topic(Enum):
 
 # Lock states
 class State(IntEnum):
-  def __int__(self):
-    return self.value
   def __str__(self):
     return str(self.value)
   UNCALIBRATED = 0
@@ -45,8 +43,6 @@ class State(IntEnum):
 
 # Lock actions
 class Action(IntEnum):
-  def __int__(self):
-    return self.value
   def __str__(self):
     return str(self.value)
   UNLOCK = 1
@@ -60,8 +56,6 @@ class Action(IntEnum):
 
 # Door sensor states
 class DoorState(IntEnum):
-  def __int__(self):
-    return self.value
   def __str__(self):
     return str(self.value)
   DEACTIVATED = 1
