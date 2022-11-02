@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 
 # Paramters
 DEVICE_ID = "device_id"
@@ -12,51 +12,66 @@ DEFAULT_DISCOVERY_TOPIC = "homeassistant"
 
 # Topics
 class Topic(Enum):
-    # This will make the class return its value instead of a name/value pair
-    def __str__(self):
-        return self.value
-    BASE = 'nuki'
-    STATE = 'state'
-    LOCK_ACTION = "lockAction"
-    CONNECTED = "connected"
-    BATTERY_CRITICAL = "batteryCritical"
-    BATTERY_CHARGE_STATE = "batteryChargeState"
-    BATTERY_CHARGING = "batteryCharging"
-    DOOR_SENSOR_STATE = "doorsensorState"
-    DOOR_SENSOR_BATTERY_CIRITCAL = "doorsensorBatteryCritical"
-    KEYPAD_BATTERY_CRITICAL = "keypadBatteryCritical"
+  # This will make the class return its value instead of a name/value pair
+  def __str__(self):
+    return self.value
+  BASE = 'nuki'
+  STATE = 'state'
+  LOCK_ACTION = "lockAction"
+  CONNECTED = "connected"
+  BATTERY_CRITICAL = "batteryCritical"
+  BATTERY_CHARGE_STATE = "batteryChargeState"
+  BATTERY_CHARGING = "batteryCharging"
+  DOOR_SENSOR_STATE = "doorsensorState"
+  DOOR_SENSOR_BATTERY_CIRITCAL = "doorsensorBatteryCritical"
+  KEYPAD_BATTERY_CRITICAL = "keypadBatteryCritical"
 
 # Lock states
-STATE_UNCALIBRATED = 0
-STATE_LOCKED = 1
-STATE_UNLOCKING = 2
-STATE_UNLOCKED = 3
-STATE_LOCKING = 4
-STATE_UNLATCHED = 5
-STATE_UNLOCKED_LOCKNGO = 6
-STATE_UNLATCHING = 7
-STATE_MOTOR_BLOCKED = 254
-STATE_UNDEFINED = 255
+class State(IntEnum):
+  def __int__(self):
+    return self.value
+  def __str__(self):
+    return str(self.value)
+  UNCALIBRATED = 0
+  LOCKED = 1
+  UNLOCKING = 2
+  UNLOCKED = 3
+  LOCKING = 4
+  UNLATCHED = 5
+  UNLOCKED_LOCKNGO = 6
+  UNLATCHING = 7
+  MOTOR_BLOCKED = 254
+  UNDEFINED = 255
 
 # Lock actions
-ACTION_UNLOCK = 1
-ACTION_LOCK = 2
-ACTION_UNLATCH = 3
-ACTION_LOCKNGO = 4
-ACTION_LOCKNGO_UNLATCH = 5
-ACTION_FULL_LOCK = 6
-ACTION_FOB = 80
-ACTION_BUTTON = 90
+class Action(IntEnum):
+  def __int__(self):
+    return self.value
+  def __str__(self):
+    return str(self.value)
+  UNLOCK = 1
+  LOCK = 2
+  UNLATCH = 3
+  LOCKNGO = 4
+  LOCKNGO_UNLATCH = 5
+  FULL_LOCK = 6
+  FOB = 80
+  BUTTON = 90
 
 # Door sensor states
-DOOR_STATE_DEACTIVATED = 1
-DOOR_STATE_DOOR_CLOSED = 2
-DOOR_STATE_DOOR_OPENED = 3
-DOOR_STATE_DOOR_STATE_UNKNOWN = 4
-DOOR_STATE_CALIBRATING = 5
-DOOR_STATE_UNCALIBRATED = 16
-DOOR_STATE_TAMPERED = 240
-DOOR_STATE_UNKNOWN = 255
+class DoorState(IntEnum):
+  def __int__(self):
+    return self.value
+  def __str__(self):
+    return str(self.value)
+  DEACTIVATED = 1
+  CLOSED = 2
+  OPENED = 3
+  STATE_UNKNOWN = 4
+  CALIBRATING = 5
+  UNCALIBRATED = 16
+  TAMPERED = 240
+  UNKNOWN = 255
 
 
 def get_error_message(parameter):
@@ -107,15 +122,15 @@ def get_lock_payload(device_id, device_name, device_model, name):
     'name': name,
     'unique_id': get_object_id(name),
     'command_topic': get_topic(device_id, Topic.LOCK_ACTION),
-    'payload_lock': str(ACTION_LOCK),
-    'payload_unlock': str(ACTION_UNLOCK),
-    'payload_open': str(ACTION_UNLATCH),
+    'payload_lock': str(Action.LOCK),
+    'payload_unlock': str(Action.UNLOCK),
+    'payload_open': str(Action.UNLATCH),
     'state_topic': get_topic(device_id, Topic.STATE),
-    'state_locked': str(STATE_LOCKED),
-    'state_unlocked': str(STATE_UNLOCKED),
-    'state_opening': str(STATE_UNLATCHING),
-    'state_open': str(STATE_UNLATCHED),
-    'value_template': '{% if value == \'\'' + str(STATE_UNLOCKED_LOCKNGO) + '\'\'%}' + str(STATE_UNLOCKED) + '{% else %}{{value}}{% endif %}'
+    'state_locked': str(State.LOCKED),
+    'state_unlocked': str(State.UNLOCKED),
+    'state_opening': str(State.UNLATCHING),
+    'state_open': str(State.UNLATCHED),
+    'value_template': '{% if value == \'\'' + str(State.UNLOCKED_LOCKNGO) + '\'\'%}' + str(State.UNLOCKED) + '{% else %}{{value}}{% endif %}'
   })
 
 
@@ -168,8 +183,8 @@ def get_door_sensor_payload(device_id, device_name, device_model, name):
     'name': name,
     'unique_id': get_object_id(name),
     'device_class': 'door',
-    'payload_off': str(DOOR_STATE_DOOR_CLOSED),
-    'payload_on': str(DOOR_STATE_DOOR_OPENED),
+    'payload_off': str(DoorState.CLOSED),
+    'payload_on': str(DoorState.OPENED),
     'state_topic': get_topic(device_id, Topic.DOOR_SENSOR_STATE),
   })
 
@@ -293,17 +308,17 @@ def main(hass, data):
   # Unlatch button
   name = device_name + " Unlatch"
   publish(hass, get_discovery_topic(discovery_topic, "button", device_id, name),
-    get_button_payload(device_id, device_name, device_model, name, ACTION_UNLATCH))
+    get_button_payload(device_id, device_name, device_model, name, Action.UNLATCH))
 
   # Lock'n'Go button
   name = device_name + " Lock-n-Go"
   publish(hass, get_discovery_topic(discovery_topic, "button", device_id, name),
-    get_button_payload(device_id, device_name, device_model, name, ACTION_LOCKNGO))
+    get_button_payload(device_id, device_name, device_model, name, Action.LOCKNGO))
 
   # Lock'n'Go with unlatch button
   name = device_name + " Lock-n-Go With Unlatch"
   publish(hass, get_discovery_topic(discovery_topic, "button", device_id, name),
-    get_button_payload(device_id, device_name, device_model, name, ACTION_LOCKNGO_UNLATCH))
+    get_button_payload(device_id, device_name, device_model, name, Action.LOCKNGO_UNLATCH))
 
 
 main(hass, data)
