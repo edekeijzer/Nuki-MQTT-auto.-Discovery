@@ -1,3 +1,5 @@
+from enum import Enum
+
 # Paramters
 DEVICE_ID = "device_id"
 DEVICE_NAME = "device_name"
@@ -9,16 +11,20 @@ KEYPAD_AVAILABLE = "keypad_available"
 DEFAULT_DISCOVERY_TOPIC = "homeassistant"
 
 # Topics
-TOPIC_BASE = "nuki"
-TOPIC_STATE = "state"
-TOPIC_LOCK_ACTION = "lockAction"
-TOPIC_CONNECTED = "connected"
-TOPIC_BATTERY_CRITICAL = "batteryCritical"
-TOPIC_BATTERY_CHARGE_STATE = "batteryChargeState"
-TOPIC_BATTERY_CHARGING = "batteryCharging"
-TOPIC_DOOR_SENSOR_STATE = "doorsensorState"
-TOPIC_DOOR_SENSOR_BATTERY_CIRITCAL = "doorsensorBatteryCritical"
-TOPIC_KEYPAD_BATTERY_CRITICAL = "keypadBatteryCritical"
+class Topic(Enum):
+    # This will make the class return its value instead of a name/value pair
+    def __str__(self):
+        return self.value
+    BASE = 'nuki'
+    STATE = 'state'
+    LOCK_ACTION = "lockAction"
+    CONNECTED = "connected"
+    BATTERY_CRITICAL = "batteryCritical"
+    BATTERY_CHARGE_STATE = "batteryChargeState"
+    BATTERY_CHARGING = "batteryCharging"
+    DOOR_SENSOR_STATE = "doorsensorState"
+    DOOR_SENSOR_BATTERY_CIRITCAL = "doorsensorBatteryCritical"
+    KEYPAD_BATTERY_CRITICAL = "keypadBatteryCritical"
 
 # Lock states
 STATE_UNCALIBRATED = 0
@@ -70,13 +76,13 @@ def get_discovery_topic(discovery_topic, component, node_id, name):
 
 
 def get_topic(device_id, topic):
-  return TOPIC_BASE + "/" + device_id + "/" + topic
+  return Topic.BASE + "/" + device_id + "/" + topic
 
 
 def get_availability(device_id):
   return [
     {
-      'topic': get_topic(device_id, TOPIC_CONNECTED),
+      'topic': get_topic(device_id, Topic.CONNECTED),
       'payload_available': 'true',
       'payload_not_available': 'false'
     }
@@ -100,11 +106,11 @@ def get_lock_payload(device_id, device_name, device_model, name):
     'device': get_device(device_id, device_name, device_model),
     'name': name,
     'unique_id': get_object_id(name),
-    'command_topic': get_topic(device_id, TOPIC_LOCK_ACTION),
+    'command_topic': get_topic(device_id, Topic.LOCK_ACTION),
     'payload_lock': str(ACTION_LOCK),
     'payload_unlock': str(ACTION_UNLOCK),
     'payload_open': str(ACTION_UNLATCH),
-    'state_topic': get_topic(device_id, TOPIC_STATE),
+    'state_topic': get_topic(device_id, Topic.STATE),
     'state_locked': str(STATE_LOCKED),
     'state_unlocked': str(STATE_UNLOCKED),
     'state_opening': str(STATE_UNLATCHING),
@@ -121,7 +127,7 @@ def get_battery_critical_payload(device_id, device_name, device_model, name):
     'unique_id': get_object_id(name),
     'device_class': 'battery',
     'entity_category': 'diagnostic',
-    'state_topic': get_topic(device_id, TOPIC_BATTERY_CRITICAL),
+    'state_topic': get_topic(device_id, Topic.BATTERY_CRITICAL),
     'payload_off': 'false',
     'payload_on': 'true'
   })
@@ -135,7 +141,7 @@ def get_battery_charge_state_payload(device_id, device_name, device_model, name)
     'unique_id': get_object_id(name),
     'device_class': 'battery',
     'entity_category': 'diagnostic',
-    'state_topic': get_topic(device_id, TOPIC_BATTERY_CHARGE_STATE),
+    'state_topic': get_topic(device_id, Topic.BATTERY_CHARGE_STATE),
     'state_class': 'measurement',
     'unit_of_measurement': '%'
   })
@@ -149,7 +155,7 @@ def get_battery_charging_payload(device_id, device_name, device_model, name):
     'unique_id': get_object_id(name),
     'device_class': 'battery_charging',
     'entity_category': 'diagnostic',
-    'state_topic': get_topic(device_id, TOPIC_BATTERY_CHARGING),
+    'state_topic': get_topic(device_id, Topic.BATTERY_CHARGING),
     'payload_off': 'false',
     'payload_on': 'true'
   })
@@ -164,7 +170,7 @@ def get_door_sensor_payload(device_id, device_name, device_model, name):
     'device_class': 'door',
     'payload_off': str(DOOR_STATE_DOOR_CLOSED),
     'payload_on': str(DOOR_STATE_DOOR_OPENED),
-    'state_topic': get_topic(device_id, TOPIC_DOOR_SENSOR_STATE),
+    'state_topic': get_topic(device_id, Topic.DOOR_SENSOR_STATE),
   })
 
 
@@ -176,7 +182,7 @@ def get_door_sensor_battery_critical_payload(device_id, device_name, device_mode
     'unique_id': get_object_id(name),
     'device_class': 'battery',
     'entity_category': 'diagnostic',
-    'state_topic': get_topic(device_id, TOPIC_DOOR_SENSOR_BATTERY_CIRITCAL),
+    'state_topic': get_topic(device_id, Topic.DOOR_SENSOR_BATTERY_CIRITCAL),
     'payload_off': 'false',
     'payload_on': 'true'
   })
@@ -190,7 +196,7 @@ def get_keypad_battery_critical_payload(device_id, device_name, device_model, na
     'unique_id': get_object_id(name),
     'device_class': 'battery',
     'entity_category': 'diagnostic',
-    'state_topic': get_topic(device_id, TOPIC_KEYPAD_BATTERY_CRITICAL),
+    'state_topic': get_topic(device_id, Topic.KEYPAD_BATTERY_CRITICAL),
     'payload_off': 'false',
     'payload_on': 'true'
   })
@@ -202,7 +208,7 @@ def get_button_payload(device_id, device_name, device_model, name, action):
     'device': get_device(device_id, device_name, device_model),
     'name': name,
     'unique_id': get_object_id(name),
-    'command_topic': get_topic(device_id, TOPIC_LOCK_ACTION),
+    'command_topic': get_topic(device_id, Topic.LOCK_ACTION),
     'payload_press': str(action)
   })
 
